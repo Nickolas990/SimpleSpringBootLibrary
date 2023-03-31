@@ -1,9 +1,9 @@
-package org.melnikov.digitalLibrary.controllers;
+package org.melnikov.simplespringboot.controllers;
 
 import jakarta.validation.Valid;
-import org.melnikov.digitalLibrary.models.Person;
-import org.melnikov.digitalLibrary.repositories.PersonRepository;
-import org.melnikov.digitalLibrary.util.PersonValidator;
+import org.melnikov.simplespringboot.models.Person;
+import org.melnikov.simplespringboot.services.PeopleService;
+import org.melnikov.simplespringboot.util.PersonValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,19 +19,19 @@ import java.util.Optional;
 @RequestMapping("/people")
 public class PeopleController {
 
-    private final PersonRepository personRepository;
+    private final PeopleService peopleService;
 
     private final PersonValidator personValidator;
 
     @Autowired
-    public PeopleController(PersonRepository personRepository, PersonValidator personValidator) {
-        this.personRepository = personRepository;
+    public PeopleController(PeopleService peopleService, PersonValidator personValidator) {
+        this.peopleService = peopleService;
         this.personValidator = personValidator;
     }
 
     @GetMapping()
     public String index(Model model) {
-        model.addAttribute("people", personRepository.findAll());
+        model.addAttribute("people", peopleService.findAll());
         return "people/index";
     }
 
@@ -48,13 +48,13 @@ public class PeopleController {
             return "people/new";
         }
 
-        personRepository.save(person);
+        peopleService.save(person);
         return "redirect:/people";
     }
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int id, Model model) {
-        Optional<Person> personToShow = personRepository.findById(id);
+        Optional<Person> personToShow = peopleService.findById(id);
         personToShow.ifPresent(person -> model.addAttribute("person", person));
         personToShow.ifPresent(person -> model.addAttribute("books", person.getBooks()));
         return "people/show";
@@ -62,7 +62,7 @@ public class PeopleController {
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") int id) {
-        Optional<Person> personToEdit = personRepository.findById(id);
+        Optional<Person> personToEdit = peopleService.findById(id);
         personToEdit.ifPresent(person -> model.addAttribute("person", person));
         return "people/edit";
     }
@@ -73,13 +73,13 @@ public class PeopleController {
         if (bindingResult.hasErrors()) {
             return "people/edit";
         }
-        personRepository.update(id, person);
+        peopleService.update(id, person);
         return "redirect:/people";
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") int id) {
-        personRepository.deleteById(id);
+        peopleService.deleteById(id);
         return "redirect:/people";
     }
 }

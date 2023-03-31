@@ -1,7 +1,8 @@
-package org.melnikov.digitalLibrary.util;
+package org.melnikov.simplespringboot.util;
 
-import org.melnikov.digitalLibrary.models.Person;
-import org.melnikov.digitalLibrary.repositories.PersonRepository;
+
+import org.melnikov.simplespringboot.models.Person;
+import org.melnikov.simplespringboot.services.PeopleService;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
@@ -14,10 +15,10 @@ import java.util.function.Predicate;
 @Component
 public class PersonValidator implements Validator {
 
-    private final PersonRepository personRepository;
+    private final PeopleService peopleService;
 
-    public PersonValidator(PersonRepository personRepository) {
-        this.personRepository = personRepository;
+    public PersonValidator(PeopleService peopleService) {
+        this.peopleService = peopleService;
     }
 
     @Override
@@ -30,7 +31,7 @@ public class PersonValidator implements Validator {
     public void validate(Object target, Errors errors) {
         Person person = (Person) target;
 
-        if (personRepository.findByName(person.getFullName()).isPresent()) {
+        if (peopleService.findByName(person.getFullName()).isPresent()) {
             errors.rejectValue("fullName", "error.person.exists", "Person with this name already exists");
         }
 
